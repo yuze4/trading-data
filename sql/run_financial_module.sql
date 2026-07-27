@@ -244,6 +244,97 @@ ORDER BY r.period_end;
 -- END sql/02_seed_nvidia_filing.sql
 -- ============================================================================
 
++-- ============================================================================
+-- BEGIN sql/11_seed_technology_research_universe.sql
+-- ============================================================================
+-- AI Infrastructure Investment Research & Portfolio Analytics Database
+-- First-version technology research universe in the yuze4/trading-data fork.
+--
+-- This is a research-universe seed, not a claim that these are the ten largest
+-- technology companies by market capitalization. The list is designed for the
+-- project's AI-infrastructure question:
+--   * infrastructure suppliers: NVDA, AMD, AVGO, MU, ANET
+--   * cloud and AI-capex buyers: MSFT, AMZN, GOOGL, META, ORCL
+--
+-- Ticker and CIK identity values were checked against the SEC company ticker
+-- reference. This file only registers securities; it does not pretend that
+-- financial filings or facts for the nine non-NVIDIA companies already exist.
+
+BEGIN;
+
+INSERT INTO securities (
+    ticker,
+    security_name,
+    asset_type,
+    exchange,
+    cik
+)
+VALUES
+    ('NVDA', 'NVIDIA Corporation', 'STOCK', 'NASDAQ', '0001045810'),
+    ('AMD', 'Advanced Micro Devices, Inc.', 'STOCK', 'NASDAQ', '0000002488'),
+    ('AVGO', 'Broadcom Inc.', 'STOCK', 'NASDAQ', '0001730168'),
+    ('MU', 'Micron Technology, Inc.', 'STOCK', 'NASDAQ', '0000723125'),
+    ('ANET', 'Arista Networks, Inc.', 'STOCK', 'NYSE', '0001596532'),
+    ('MSFT', 'Microsoft Corporation', 'STOCK', 'NASDAQ', '0000789019'),
+    ('AMZN', 'Amazon.com, Inc.', 'STOCK', 'NASDAQ', '0001018724'),
+    ('GOOGL', 'Alphabet Inc.', 'STOCK', 'NASDAQ', '0001652044'),
+    ('META', 'Meta Platforms, Inc.', 'STOCK', 'NASDAQ', '0001326801'),
+    ('ORCL', 'Oracle Corporation', 'STOCK', 'NYSE', '0001341439')
+ON CONFLICT (ticker) DO UPDATE
+SET security_name = EXCLUDED.security_name,
+    asset_type = EXCLUDED.asset_type,
+    exchange = EXCLUDED.exchange,
+    cik = EXCLUDED.cik,
+    is_active = TRUE;
+
+COMMIT;
+
+-- Verification 1: the first-version research universe should contain ten
+-- active securities, including the existing NVIDIA pilot issuer.
+SELECT
+    ticker,
+    security_name,
+    asset_type,
+    exchange,
+    cik,
+    is_active
+FROM securities
+WHERE ticker IN (
+    'NVDA',
+    'AMD',
+    'AVGO',
+    'MU',
+    'ANET',
+    'MSFT',
+    'AMZN',
+    'GOOGL',
+    'META',
+    'ORCL'
+)
+ORDER BY ticker;
+
+-- Verification 2: expected result is 10.
+SELECT
+    COUNT(*) AS technology_universe_count,
+    COUNT(*) FILTER (WHERE is_active = TRUE) AS active_technology_count
+FROM securities
+WHERE ticker IN (
+    'NVDA',
+    'AMD',
+    'AVGO',
+    'MU',
+    'ANET',
+    'MSFT',
+    'AMZN',
+    'GOOGL',
+    'META',
+    'ORCL'
+);
+
+-- ============================================================================
+-- END sql/11_seed_technology_research_universe.sql
+-- ============================================================================
+
 -- ============================================================================
 -- BEGIN sql/04_seed_nvidia_financial_facts.sql
 -- ============================================================================
@@ -1797,7 +1888,8 @@ FROM vw_financial_data_quality_issues;
 -- ============================================================================
 -- AI Infrastructure Investment Research & Portfolio Analytics Database
 -- One-pass validation queries for the financial-statement module.
--- Run this file after sql/01 through sql/08 and sql/10 in the same PostgreSQL session.
+-- Run this file after sql/01 through sql/08, sql/10, and sql/11 in the same
+-- PostgreSQL session.
 
 -- 1. Confirm the module's main objects exist.
 SELECT table_name AS object_name
@@ -1821,7 +1913,26 @@ WHERE table_schema = 'public'
   )
 ORDER BY table_name;
 
--- 2. Confirm the pilot contains one issuer, five filings, and 45 facts in
+-- 2. Confirm the first-version technology universe contains ten active
+-- securities. Only NVIDIA has financial facts in this step.
+SELECT
+    COUNT(*) AS technology_universe_count,
+    COUNT(*) FILTER (WHERE is_active = TRUE) AS active_technology_count
+FROM securities
+WHERE ticker IN (
+    'NVDA',
+    'AMD',
+    'AVGO',
+    'MU',
+    'ANET',
+    'MSFT',
+    'AMZN',
+    'GOOGL',
+    'META',
+    'ORCL'
+);
+
+-- 3. Confirm the pilot contains one issuer, five filings, and 45 facts in
 -- total. The current Q1 FY27 filing should still contain nine facts.
 SELECT
     (SELECT COUNT(*) FROM securities WHERE ticker = 'NVDA') AS nvda_security_count,
@@ -1860,7 +1971,7 @@ SELECT
           AND r.accession_number = '000104581026000052'
     ) AS nvda_current_fact_count;
 
--- 3. Human-readable financial summary.
+-- 4. Human-readable financial summary.
 SELECT
     ticker,
     fiscal_year,
@@ -1882,7 +1993,7 @@ FROM vw_financial_statement_summary
 WHERE ticker = 'NVDA'
 ORDER BY report_period_end;
 
--- 4. Window-function growth output.
+-- 5. Window-function growth output.
 -- The first four rows do not have a prior-year comparison. The current Q1 FY27
 -- row should have sequential and year-over-year growth after the four historical
 -- quarters are loaded.
@@ -1902,7 +2013,7 @@ FROM vw_financial_statement_growth
 WHERE ticker = 'NVDA'
 ORDER BY report_period_end;
 
--- 5. Quality gate. A zero count is expected for the current pilot.
+-- 6. Quality gate. A zero count is expected for the current pilot.
 SELECT
     COUNT(*) AS quality_issue_count
 FROM vw_financial_data_quality_issues;
