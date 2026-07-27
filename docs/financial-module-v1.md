@@ -1,6 +1,7 @@
 # Financial Statement Analysis Module v1
 
-Status: implementation batch prepared; PostgreSQL runtime verification is pending.
+Status: the one-quarter pilot was runtime-verified in PostgreSQL 16; the
+five-quarter expansion is prepared and awaits the next browser validation.
 
 This module is a new addition to the `yuze4/trading-data` fork. The upstream
 repository supplies the market-data foundation; it does not contain the
@@ -40,6 +41,7 @@ remain the foundation for later price-data integration.
 | `sql/07_create_financial_growth_view.sql` | Sequential and year-over-year growth using `LAG` |
 | `sql/08_create_financial_quality_view.sql` | Missing, duplicate, unmapped, unit, period, and filing-date checks |
 | `sql/09_validate_financial_module.sql` | One-pass validation queries for the complete module |
+| `sql/10_seed_nvidia_historical_quarters.sql` | Four prior NVIDIA quarters for sequential and year-over-year analysis |
 
 ## Data flow
 
@@ -68,6 +70,7 @@ browser-based validation:
 03_create_financial_facts.sql
 02_seed_nvidia_filing.sql
 04_seed_nvidia_financial_facts.sql
+10_seed_nvidia_historical_quarters.sql
 05_create_financial_statement_summary_view.sql
 06_create_financial_metric_mappings.sql
 07_create_financial_growth_view.sql
@@ -83,12 +86,12 @@ the earlier files.
 The manually seeded NVIDIA pilot should contain:
 
 - one issuer;
-- one filing;
-- nine financial facts;
+- five filings: Q1 FY26 through Q4 FY26 plus Q1 FY27;
+- 45 financial facts, nine per filing;
 - nine active manual mapping rows;
-- one summary row;
-- one growth row with `NEEDS_MORE_PERIODS`, because one filing is not enough
-  for a year-over-year comparison;
+- five summary rows;
+- five growth rows. The first four rows have incomplete comparison history;
+  the current Q1 FY27 row can calculate sequential and year-over-year growth;
 - zero quality issues, assuming all files run successfully.
 
 The summary calculations use normalized positive CapEx:
@@ -114,15 +117,25 @@ free cash flow = operating cash flow - CapEx
 
 1. The NVIDIA facts are a manually verified pilot seed, not an automatic
    SEC/XBRL ingestion pipeline.
-2. The pilot `period_start` value `2026-01-26` is explicitly marked as an
-   unverified working boundary in the seed SQL. Production ingestion must read
-   and validate the XBRL context.
-3. Only one filing is loaded, so growth calculations correctly report that more
-   periods are required.
+2. The historical seed's `period_start` values are explicitly marked as
+   unverified working boundaries. Production ingestion must read and validate
+   the exact XBRL context for each fact.
+3. Q2 and Q3 quarter-only operating cash flow and CapEx are derived from
+   cumulative cash-flow statements; Q4 quarter-only values are derived from
+   annual values less the first nine months. The seed documents that
+   provenance, but it is not yet an automatic XBRL ingestion pipeline.
 4. The quality view checks structural consistency; it does not prove that a
    source filing is economically correct.
 5. Price performance, AI-infrastructure theme membership, portfolio holdings,
    and risk limits are future modules.
+
+## Official source documents used for the historical seed
+
+- [NVIDIA Q1 FY26 Form 10-Q](https://www.sec.gov/Archives/edgar/data/1045810/000104581025000116/nvda-20250427.htm)
+- [NVIDIA Q2 FY26 Form 10-Q](https://www.sec.gov/Archives/edgar/data/1045810/000104581025000209/nvda-20250727.htm)
+- [NVIDIA Q3 FY26 Form 10-Q](https://www.sec.gov/Archives/edgar/data/1045810/000104581025000230/nvda-20251026.htm)
+- [NVIDIA FY26 Form 10-K](https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm)
+- [NVIDIA Q4 FY26 earnings release](https://www.sec.gov/Archives/edgar/data/1045810/000104581026000019/q4fy26pr.htm)
 
 ## Career relevance
 
