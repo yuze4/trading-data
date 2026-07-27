@@ -1,6 +1,8 @@
 # Financial Statement Pilot: NVIDIA Q1 FY2027
 
-Status: pilot mapping only. This document records one manually verified filing example. It is not produced by the project pipeline yet.
+Status: manually verified pilot plus reproducible SQL seed. The data is not
+produced by the automatic project pipeline yet, and the complete SQL module
+still requires PostgreSQL runtime verification.
 
 ## Source filing
 
@@ -71,4 +73,8 @@ The production pipeline will need to:
 
 ## Status boundary
 
-This pilot confirms that the proposed metric definitions can be mapped manually to a real filing. It does not confirm that SEC XBRL ingestion, concept mapping, quarterly normalization, or database calculations work automatically. Those remain unimplemented and unverified.
+This pilot confirms that the proposed metric definitions can be mapped manually
+to a real filing. The fork now contains a reproducible manual seed, explicit
+metric mappings, summary/growth views, and quality-check SQL for this pilot.
+Those SQL files still require PostgreSQL runtime verification. Automatic SEC
+XBRL ingestion and quarterly normalization remain unimplemented.

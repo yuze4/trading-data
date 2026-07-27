@@ -1,6 +1,9 @@
 # Financial Statement Metrics v1
 
-Status: design only. The metric definitions below are planned for the first financial-statement module. No live SEC data has been loaded and no calculation has been verified yet.
+Status: prototype implementation prepared. The metric definitions below are
+implemented by the financial-statement SQL batch, but the complete batch still
+requires PostgreSQL runtime verification. Automatic SEC/XBRL ingestion and
+multi-quarter production data are not implemented yet.
 
 ## Scope
 
@@ -173,8 +176,10 @@ The output is a research aid. It is not a buy, sell, or return guarantee.
 
 ## Status boundary
 
-The fork now contains DDL for `financial_reports` and `financial_facts`, plus a
-reproducible seed for one manually verified NVIDIA filing. The original
-upstream repository does not contain these additions. SEC XBRL ingestion,
-financial metric mappings, financial-fact seed data, quarterly normalization,
-and financial analytics views are not implemented or runtime-verified yet.
+The fork now contains DDL for `financial_reports`, `financial_facts`, and
+`financial_metric_mappings`, a reproducible seed for one manually verified
+NVIDIA filing, and SQL definitions for summary, growth, and quality views. The
+original upstream repository does not contain these additions. The complete
+SQL batch is prepared but not yet runtime-verified in PostgreSQL. Automatic SEC
+XBRL ingestion, multiple-quarter production data, and price-linked analysis
+remain future work.
