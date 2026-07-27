@@ -174,8 +174,9 @@ COMMENT ON VIEW vw_financial_statement_growth IS
 
 COMMIT;
 
--- Verification: one NVIDIA pilot row is expected, with no prior-year growth
--- yet because only one filing has been loaded.
+-- Verification: one NVIDIA row is expected per loaded filing. The current Q1
+-- FY27 row can calculate sequential and year-over-year growth after the four
+-- historical quarters are included.
 SELECT
     ticker,
     fiscal_year,
