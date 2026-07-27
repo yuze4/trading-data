@@ -85,7 +85,7 @@ SELECT
     fundamental_direction
 FROM vw_financial_statement_growth
 WHERE ticker = 'NVDA'
-ORDER BY period_end;
+ORDER BY report_period_end;
 
 -- 5. Quality gate. A zero count is expected for the current pilot.
 SELECT
