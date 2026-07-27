@@ -873,53 +873,53 @@ WITH ordered_periods AS (
     -- after the fiscal year and fiscal period are checked below.
     SELECT
         s.*,
-        LAG(s.period_end, 1) OVER (
+        LAG(s.report_period_end, 1) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS previous_period_end,
         LAG(s.revenue_usd_millions, 1) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS previous_revenue_usd_millions,
         LAG(s.operating_income_usd_millions, 1) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS previous_operating_income_usd_millions,
         LAG(s.free_cash_flow_usd_millions, 1) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS previous_free_cash_flow_usd_millions,
-        LAG(s.period_end, 4) OVER (
+        LAG(s.report_period_end, 4) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS prior_year_period_end_candidate,
         LAG(s.fiscal_year, 4) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS prior_year_fiscal_year_candidate,
         LAG(s.fiscal_period, 4) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS prior_year_fiscal_period_candidate,
         LAG(s.revenue_usd_millions, 4) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS prior_year_revenue_usd_millions_candidate,
         LAG(s.operating_income_usd_millions, 4) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS prior_year_operating_income_usd_millions_candidate,
         LAG(s.free_cash_flow_usd_millions, 4) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS prior_year_free_cash_flow_usd_millions_candidate,
         LAG(s.operating_margin_pct, 4) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS prior_year_operating_margin_pct_candidate,
         LAG(s.free_cash_flow_margin_pct, 4) OVER (
             PARTITION BY s.security_id
-            ORDER BY s.period_end
+            ORDER BY s.report_period_end
         ) AS prior_year_free_cash_flow_margin_pct_candidate
     FROM vw_financial_statement_summary AS s
 ),
@@ -1050,7 +1050,7 @@ SELECT
     fundamental_direction
 FROM vw_financial_statement_growth
 WHERE ticker = 'NVDA'
-ORDER BY period_end;
+ORDER BY report_period_end;
 
 -- ============================================================================
 -- END sql/07_create_financial_growth_view.sql
@@ -1383,7 +1383,7 @@ SELECT
     fundamental_direction
 FROM vw_financial_statement_growth
 WHERE ticker = 'NVDA'
-ORDER BY period_end;
+ORDER BY report_period_end;
 
 -- 5. Quality gate. A zero count is expected for the current pilot.
 SELECT
