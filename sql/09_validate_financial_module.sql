@@ -1,6 +1,7 @@
 -- AI Infrastructure Investment Research & Portfolio Analytics Database
 -- One-pass validation queries for the financial-statement module.
--- Run this file after sql/01 through sql/08 and sql/10 in the same PostgreSQL session.
+-- Run this file after sql/01 through sql/08, sql/10, and sql/11 in the same
+-- PostgreSQL session.
 
 -- 1. Confirm the module's main objects exist.
 SELECT table_name AS object_name
@@ -24,7 +25,26 @@ WHERE table_schema = 'public'
   )
 ORDER BY table_name;
 
--- 2. Confirm the pilot contains one issuer, five filings, and 45 facts in
+-- 2. Confirm the first-version technology universe contains ten active
+-- securities. Only NVIDIA has financial facts in this step.
+SELECT
+    COUNT(*) AS technology_universe_count,
+    COUNT(*) FILTER (WHERE is_active = TRUE) AS active_technology_count
+FROM securities
+WHERE ticker IN (
+    'NVDA',
+    'AMD',
+    'AVGO',
+    'MU',
+    'ANET',
+    'MSFT',
+    'AMZN',
+    'GOOGL',
+    'META',
+    'ORCL'
+);
+
+-- 3. Confirm the pilot contains one issuer, five filings, and 45 facts in
 -- total. The current Q1 FY27 filing should still contain nine facts.
 SELECT
     (SELECT COUNT(*) FROM securities WHERE ticker = 'NVDA') AS nvda_security_count,
@@ -63,7 +83,7 @@ SELECT
           AND r.accession_number = '000104581026000052'
     ) AS nvda_current_fact_count;
 
--- 3. Human-readable financial summary.
+-- 4. Human-readable financial summary.
 SELECT
     ticker,
     fiscal_year,
@@ -85,7 +105,7 @@ FROM vw_financial_statement_summary
 WHERE ticker = 'NVDA'
 ORDER BY report_period_end;
 
--- 4. Window-function growth output.
+-- 5. Window-function growth output.
 -- The first four rows do not have a prior-year comparison. The current Q1 FY27
 -- row should have sequential and year-over-year growth after the four historical
 -- quarters are loaded.
@@ -105,7 +125,7 @@ FROM vw_financial_statement_growth
 WHERE ticker = 'NVDA'
 ORDER BY report_period_end;
 
--- 5. Quality gate. A zero count is expected for the current pilot.
+-- 6. Quality gate. A zero count is expected for the current pilot.
 SELECT
     COUNT(*) AS quality_issue_count
 FROM vw_financial_data_quality_issues;
