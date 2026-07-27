@@ -3,7 +3,7 @@
 -- The upstream repository does not contain this financial-statement view.
 --
 -- This is a regular VIEW, not a materialized view. It always reads the
--- current financial_facts rows and is appropriate for the first pilot.
+-- current financial_facts rows and is appropriate for the browser pilot.
 
 BEGIN;
 
@@ -148,7 +148,8 @@ COMMENT ON VIEW vw_financial_statement_summary IS
 
 COMMIT;
 
--- Verification: the NVIDIA pilot should produce one summary row.
+-- Verification: the NVIDIA pilot should produce one summary row per loaded
+-- filing (five rows after the historical seed is included).
 SELECT
     ticker,
     fiscal_year,
