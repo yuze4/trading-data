@@ -6,6 +6,10 @@
 -- The source filing reports USD millions, except per-share data.
 -- This is a controlled seed for learning and validation, not the production
 -- SEC/XBRL ingestion pipeline.
+--
+-- UNVERIFIED BOUNDARY: 2026-01-26 is the working period_start used for this
+-- pilot, inferred from the fiscal-calendar context. The production pipeline
+-- must confirm period_start from the filing's XBRL context before using it.
 
 BEGIN;
 
