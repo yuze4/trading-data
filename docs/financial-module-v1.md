@@ -1,7 +1,8 @@
 # Financial Statement Analysis Module v1
 
-Status: the one-quarter pilot was runtime-verified in PostgreSQL 16; the
-five-quarter expansion is prepared and awaits the next browser validation.
+Status: the one-quarter pilot and five-quarter NVIDIA expansion were
+runtime-verified in PostgreSQL 16. The ten-company research universe is now
+registered; only NVIDIA has financial facts loaded so far.
 
 This module is a new addition to the `yuze4/trading-data` fork. The upstream
 repository supplies the market-data foundation; it does not contain the
@@ -42,6 +43,7 @@ remain the foundation for later price-data integration.
 | `sql/08_create_financial_quality_view.sql` | Missing, duplicate, unmapped, unit, period, and filing-date checks |
 | `sql/09_validate_financial_module.sql` | One-pass validation queries for the complete module |
 | `sql/10_seed_nvidia_historical_quarters.sql` | Four prior NVIDIA quarters for sequential and year-over-year analysis |
+| `sql/11_seed_technology_research_universe.sql` | First-version ten-company AI infrastructure technology research universe |
 
 ## Data flow
 
@@ -69,6 +71,7 @@ browser-based validation:
 01_create_financial_reports.sql
 03_create_financial_facts.sql
 02_seed_nvidia_filing.sql
+11_seed_technology_research_universe.sql
 04_seed_nvidia_financial_facts.sql
 10_seed_nvidia_historical_quarters.sql
 05_create_financial_statement_summary_view.sql
@@ -82,6 +85,12 @@ The order matters because the later views depend on tables and data created by
 the earlier files.
 
 ## Expected pilot output
+
+The first-version research universe should contain:
+
+- ten active technology securities;
+- one company with financial facts loaded so far: NVIDIA;
+- nine additional securities registered for future filing ingestion.
 
 The manually seeded NVIDIA pilot should contain:
 
@@ -117,16 +126,19 @@ free cash flow = operating cash flow - CapEx
 
 1. The NVIDIA facts are a manually verified pilot seed, not an automatic
    SEC/XBRL ingestion pipeline.
-2. The historical seed's `period_start` values are explicitly marked as
+2. The technology universe contains ten registered securities, but only NVIDIA
+   has financial facts loaded at this stage. The other nine require the next
+   filing-ingestion step.
+3. The historical seed's `period_start` values are explicitly marked as
    unverified working boundaries. Production ingestion must read and validate
    the exact XBRL context for each fact.
-3. Q2 and Q3 quarter-only operating cash flow and CapEx are derived from
+4. Q2 and Q3 quarter-only operating cash flow and CapEx are derived from
    cumulative cash-flow statements; Q4 quarter-only values are derived from
    annual values less the first nine months. The seed documents that
    provenance, but it is not yet an automatic XBRL ingestion pipeline.
-4. The quality view checks structural consistency; it does not prove that a
+5. The quality view checks structural consistency; it does not prove that a
    source filing is economically correct.
-5. Price performance, AI-infrastructure theme membership, portfolio holdings,
+6. Price performance, AI-infrastructure theme membership, portfolio holdings,
    and risk limits are future modules.
 
 ## Official source documents used for the historical seed
