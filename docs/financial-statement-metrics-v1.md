@@ -100,20 +100,27 @@ Planned fields:
 
 One row per reported XBRL fact or normalized fact observation.
 
-Planned fields:
+The first DDL implementation is in `sql/03_create_financial_facts.sql`.
+Its fields are:
 
 - fact_id;
 - report_id;
-- security_id;
 - canonical_metric;
 - taxonomy;
 - concept;
 - value;
 - unit;
+- observation_type (`INSTANT` or `DURATION`);
 - period_start;
 - period_end;
 - filed_at;
 - source_fact_hash.
+
+`security_id` is intentionally reached through `report_id` and
+`financial_reports.security_id` instead of being duplicated in this first
+normalized table. This avoids storing two independent security relationships
+that could disagree. A later performance optimization may denormalize this
+key only if a consistency constraint is added.
 
 ### financial_metric_mappings
 
@@ -166,4 +173,8 @@ The output is a research aid. It is not a buy, sell, or return guarantee.
 
 ## Status boundary
 
-This file defines the target design only. The original upstream repository does not currently contain these tables, SEC ingestion, metric mappings, or financial analytics views.
+The fork now contains DDL for `financial_reports` and `financial_facts`, plus a
+reproducible seed for one manually verified NVIDIA filing. The original
+upstream repository does not contain these additions. SEC XBRL ingestion,
+financial metric mappings, financial-fact seed data, quarterly normalization,
+and financial analytics views are not implemented or runtime-verified yet.
